@@ -4,7 +4,20 @@ const minWidth = numDivisions * 4;
 const maxWidth = numDivisions * 40;
 
 var canvas = document.querySelector('canvas');
-drawGameBoardGrid(canvas, 'white', 'lightgray');
+var canvas2 = createBoard(625);
+drawGameBoardGrid(canvas2, 'white', 'lightgray');
+var div = document.querySelector('.gameboard');
+div.appendChild(canvas2);
+
+
+/*
+Creates a square canvas of the specified dimension
+*/
+function createBoard(dimension) {
+	var canvas = document.createElement('canvas');
+	canvas.width = canvas.height = dimension;
+	return canvas;
+}
 
 /*
 Draws a checkerboard grid on the canvas.
