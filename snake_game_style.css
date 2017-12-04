@@ -4,4 +4,5 @@ h1 {
 
 canvas {
 	border: 1px solid black;
+	padding: 0px;
 }
