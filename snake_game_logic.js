@@ -9,6 +9,36 @@ drawGameBoardGrid(canvas2, 'white', 'lightgray');
 var div = document.querySelector('.gameboard');
 div.appendChild(canvas2);
 
+var c1 = new Coordinates(5, 10);
+var c2 = new Coordinates(6, 7);
+var c3 = new Coordinates(5, 10);
+
+console.log(c1.equals(c2));
+console.log(c1.equals(c3));
+console.log(c2.equals(c3));
+console.log(c2.getX());
+c2.setX(20);
+console.log(c2.getX());
+console.log(c2.getY());
+ 
+
+/*
+Coordinates object
+*/
+function Coordinates(x, y) {
+	this.x = x;
+	this.y = y;
+	
+	this.getX = function() { return this.x; }
+	this.getY = function() { return this.y; }
+	
+	this.setX = function(x) { this.x = x; }
+	this.setY = function(y) { this.y = y; }
+	
+	this.equals = function(otherCoord) {
+		return (this.x === otherCoord.x && this.y === otherCoord.y) ? true : false;
+	}
+}
 
 /*
 Creates a square canvas of the specified dimension
