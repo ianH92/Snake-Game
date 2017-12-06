@@ -1,38 +1,39 @@
-
-
 // Global constants
 const numDivisions = 25;
 const minWidth = numDivisions * 4;
 const maxWidth = numDivisions * 40;
 
+const col1 = 'red';
+const col2 = 'gold';
+const col3 = 'white';
+const col4 = 'lightgray';
+
 var canvas = document.querySelector('canvas');
-var canvasWidth = canvas.width;
-var squareSize = canvasWidth / numDivisions;
-var canvasCtx = canvas.getContext('2d');
-drawGameBoardGrid(canvasCtx, canvasWidth, squareSize, 'white', 'lightgray');
+var width = canvas.width;
+var squareSize = width / numDivisions;
+var ctx = canvas.getContext('2d');
+drawGameBoardGrid(ctx, width, squareSize, col3, col4);
 
-var snake = new Snake(new SnakeSegment(12, 12, 'red', 'gold'));
-drawSnake(canvasCtx, squareSize, snake.getSnake());
-var newHead = createNextSegment(1, snake.getHeadX(), snake.getHeadY(), 'red', 'gold');
-snake.updateSnake(newHead, false);
-drawSnake(canvasCtx, squareSize, snake.getSnake());
-newHead = createNextSegment(3, snake.getHeadX(), snake.getHeadY(), 'red', 'gold');
-snake.updateSnake(newHead, false);
-drawSnake(canvasCtx, squareSize, snake.getSnake());
-newHead = createNextSegment(2, snake.getHeadX(), snake.getHeadY(), 'red', 'gold');
-snake.updateSnake(newHead, false);
-drawSnake(canvasCtx, squareSize, snake.getSnake());
-console.log('snake.length = ' + snake.length());
+var lastKey = 37;
+//Event listeners for keys
+window.addEventListener('keydown', (event) => { lastKey = event.keyCode; });
 
-newHead = createNextSegment(2, 20, 8, 'red', 'gold');
-snake.updateSnake(newHead, false);
-drawSnake(canvasCtx, squareSize, snake.getSnake());
-console.log('snake.length = ' + snake.length());
-newHead = createNextSegment(2, snake.getHeadX(), snake.getHeadY(), 'red', 'gold');
-snake.updateSnake(newHead, false);
-drawSnake(canvasCtx, squareSize, snake.getSnake());
-console.log('snake.length = ' + snake.length());
 
+var start = new SnakeSegment(12, 12, col1, col2);
+var snake = new Snake(start);
+
+//setInterval(function(){ gameLoop(snake, lastKey, ctx, width, squareSize, col1, col2, col3, col4); }, 300);
+
+function gameLoop(snake, lastKey, ctx, width, squareSize, col1, col2, col3, col4) {
+	var newHead = createNextSegment(lastKey, snake.getHeadX(), snake.getHeadY(), col1, col2);
+	snake.updateSnake(newHead, false);
+	drawGameBoardGrid(ctx, width, squareSize, col3, col4);
+	drawSnake(ctx, squareSize, snake.getSnake());
+}
+
+
+/* TESTED
+*/
 function drawSnake(canvasCtx, squareSize, snake) {
 	for(var i = 0; i < snake.length; i++) {
 		var s = snake[i];
@@ -49,10 +50,13 @@ function drawSquare(canvasCtx, squareSize, x, y, color1, color2) {
 	canvasCtx.fillRect((x * squareSize) + 2, (y * squareSize) + 2, squareSize - 4, squareSize - 4);
 }
 
+/* TESTED
+*/
 function Snake(startSegment) {
 	this.snake = [startSegment];
 	
 	this.length = function() { return this.snake.length; }
+	this.getHead = function() { return this.snake[0]; }
 	this.getHeadX = function() { return this.snake[0].getX(); }
 	this.getHeadY = function() { return this.snake[0].getY(); }
 	this.getSnake = function() { return this.snake; }
@@ -95,13 +99,13 @@ function outsideOfBorders(segment, numOfDivisions) {
 */
 function createNextSegment(keystroke, x, y, col1, col2) {
 	switch(keystroke) {
-		case 1: x += -1;
+		case 37: x += -1; //left
 				break;
-		case 2: x += 1;
+		case 38: y += -1; //up
 				break;
-		case 3: y += -1;
+		case 39: x += 1; //right
 				break;
-		case 4: y += 1;
+		case 40: y += 1; //down
 				break;
 		default: return null;
 	}
