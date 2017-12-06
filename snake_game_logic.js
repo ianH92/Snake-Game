@@ -1,99 +1,28 @@
+
+
 // Global constants
 const numDivisions = 25;
 const minWidth = numDivisions * 4;
 const maxWidth = numDivisions * 40;
 
 var canvas = document.querySelector('canvas');
-var canvas2 = createBoard(625);
-drawGameBoardGrid(canvas2, 'white', 'lightgray');
-var div = document.querySelector('.gameboard');
-div.appendChild(canvas2);
+var canvasWidth = canvas.width;
+var squareSize = canvasWidth / numDivisions;
+drawGameBoardGrid(canvas, 'white', 'lightgray');
+drawSquare(canvas, squareSize, 0, 0, 'blue', 'lightblue');
+drawSquare(canvas, squareSize, 0, 1, 'blue', 'lightblue');
+drawSquare(canvas, squareSize, 0, 2, 'blue', 'lightblue');
+drawSquare(canvas, squareSize, 0, 3, 'blue', 'lightblue');
 
 
-/*
 
-*/
-function SnakeSegment(x, y, deltaX, deltaY, color, next) {
-	this.coordinates = new Coordinates(x, y, deltaX, deltaY);
-	this.color = color;
-	this.next = next;
+function drawSquare(canvas, squareSize, x, y, color1, color2) {
+	var canvasCtx = canvas.getContext('2d');
+	canvasCtx.fillStyle = color1;
+	canvasCtx.fillRect((x * squareSize), (y * squareSize), squareSize, squareSize);
 	
-	this.directionChanges = [];
-	
-	this.pushChange = function(changeCoord) {
-		if(typeof(changeCoord) !== typeof(new ChangeCoordinates)) {
-			throw new GameLogicError("method pushChange only adds ChangeCoordinates.");
-		} else {
-			this.directionChanges.push(changeCoordinates);
-		}
-	}
-	this.popChange = function() { return this.directionChanges.shift(); }
-	
-	this.updatePosition = function() {
-		this.coordinates.setX(this.coordinates.getX() + this.coordinates.getDeltaX());
-		this.coordinates.setY(this.coordinates.getY() + this.coordinates.getDeltaY());
-	}
-	
-	this.checkForChanges = function() {
-		if(this.directionChanges.length > 0) {
-			
-			var head = this.directionChanges[0];
-			if(head.getCountdown() === 1) {
-				
-				if(head.getCoordinates().equals(this.coordinates)) {
-					//Remove the change and apply it; update direction of current coordinates
-					this.popChange();
-					this.coordinates.setDeltaXandDeltaY(head.getDeltaX(), head.getDeltaY());
-				} else {
-					throw new GameLogicError('Changing direction but coordinates don\'t match');
-				}
-			}
-		}
-	}
-	
-	this.updateChanges = function() {
-		for(var i = 0; i < this.directionChanges.length; i++) {
-			this.directionChanges[i].decCountdown();
-		}
-	}
-}
-
-/*
-Holds a change in coordinates
-*/
-function ChangeCoordinates(x, y, deltaX, deltaY, countdown) {
-	this.coordinates = new Coordinates(x, y, deltaX, deltaY);
-	this.countdown = countdown;
-	
-	this.decCountdown = function() { this.countdown--; }
-	this.getCountdown() = function() { return this.countdown; }
-	this.getCoordinates() = function() { return this.coordinates; }
-}
-
-/*
-Coordinates object
-*/
-function Coordinates(x, y, deltaX, deltaY) {
-	this.x = x;
-	this.y = y;
-	this.deltaX = deltaX;
-	this.deltaY = deltaY;
-	
-	this.getX = function() { return this.x; }
-	this.getY = function() { return this.y; }
-	this.getDeltaX = function() { return this.deltaX; }
-	this.getDeltaY = function() { return this.deltaY; }
-	
-	this.setX = function(x) { this.x = x; }
-	this.setY = function(y) { this.y = y; }
-	this.setDeltaXandY = function(dx, dy) {
-		this.deltaX = deltaX;
-		this.deltaY = deltaY;
-	}
-	
-	this.equals = function(otherCoord) {
-		return (this.x === otherCoord.x && this.y === otherCoord.y) ? true : false;
-	}
+	canvasCtx.fillStyle = color2;
+	canvasCtx.fillRect((x * squareSize) + 2, (y * squareSize) + 2, squareSize - 4, squareSize - 4);
 }
 
 /*
@@ -151,14 +80,6 @@ function checkCanvas(canvas) {
 	}
 	if(width > maxWidth) {
 		throw new GameBoardError('canvas width must be <= ' + maxWidth + '. Currently: ' + width + '.');
-	}
-}
-
-function GameLogicError(msg) {
-	this.msg = msg;
-	this.name = 'GameLogicError';
-	this.toString = function() {
-		return this.name + ': ' + this.msg;
 	}
 }
 
