@@ -22,7 +22,73 @@ window.addEventListener('keydown', (event) => { lastKey = event.keyCode; });
 var start = new SnakeSegment(12, 12, col1, col2);
 var snake = new Snake(start);
 
+var y = createNextSegment(37, snake.getHeadX(), snake.getHeadY(), col1, col2);
+snake.updateSnake(y, true);
+console.log('length = ' + snake.length());
+y = createNextSegment(37, snake.getHeadX(), snake.getHeadY(), col1, col2);
+snake.updateSnake(y, true);
+y = createNextSegment(37, snake.getHeadX(), snake.getHeadY(), col1, col2);
+snake.updateSnake(y, true);
+drawSnake(ctx, squareSize, snake.getSnake());
+var m = createFood(numDivisions, col1, col2, snake);
+console.log('m x = ' + m.getX());
+console.log('m y = ' + m.getY());
+drawSquare(ctx, squareSize, m.getX(), m.getY(), col1, col2);
+
+var y = new SnakeSegment(5, 10, col1, col2);
+console.log(snake.intersectsSnake(y.getX(), y.getY()) + ' should be false');
+console.log('---------------');
+y = new SnakeSegment(7, 11, col1, col2);
+console.log(snake.intersectsSnake(y.getX(), y.getY()) + ' should be false');
+console.log('---------------');
+y = new SnakeSegment(12, 12, col1, col2);
+console.log(snake.intersectsSnake(y.getX(), y.getY()) + 'should be true');
+console.log('---------------');
+y = new SnakeSegment(11, 12, col1, col2);
+console.log(snake.intersectsSnake(y.getX(), y.getY()) + 'should be true');
+console.log('---------------');
+y = new SnakeSegment(10, 10, col1, col2);
+console.log(snake.intersectsSnake(y.getX(), y.getY()) + ' should be false');
+console.log('---------------');
+y = new SnakeSegment(10, 12, col1, col2);
+console.log(snake.intersectsSnake(y.getX(), y.getY()) + 'should be true');
+console.log('---------------');
+y = new SnakeSegment(9, 12, col1, col2);
+console.log(snake.intersectsSnake(y.getX(), y.getY()) + 'should be true');
+console.log('---------------');
+y = new SnakeSegment(8, 12, col1, col2);
+console.log(snake.intersectsSnake(y.getX(), y.getY()) + ' should be false');
+console.log('---------------');
+
+
+
 //setInterval(function(){ gameLoop(snake, lastKey, ctx, width, squareSize, col1, col2, col3, col4); }, 300);
+
+
+function createFood(numDivisions, col1, col2, snake) {
+	let x = getRand(numDivisions);
+	let y = getRand(numDivisions);
+	
+	while(snake.intersectsSnake(x, y)) {
+		x = getRand(numDivisions);
+		y = getRand(numDivisions);
+	}
+	
+	return new SnakeSegment(x, y, col1, col2);
+}
+
+
+
+
+function getRand(max) {
+	return Math.floor(Math.random() * max);
+}
+
+
+
+
+
+
 
 function gameLoop(snake, lastKey, ctx, width, squareSize, col1, col2, col3, col4) {
 	var newHead = createNextSegment(lastKey, snake.getHeadX(), snake.getHeadY(), col1, col2);
@@ -66,10 +132,7 @@ function Snake(startSegment) {
 		if(!growSnake) { this.snake.pop(); }
 	}
 	
-	this.intersectsSnake = function(segment) {
-		var x = segment.getX();
-		var y = segment.getY();
-		
+	this.intersectsSnake = function(x, y) {
 		for(var i = 0; i < this.snake.length; i++) {
 			var currSeg = this.snake[i];
 			if(x === currSeg.getX() && y === currSeg.getY()) {
