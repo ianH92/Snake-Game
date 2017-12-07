@@ -1,8 +1,9 @@
 // Global constants
-const numDivisions = 25;
+const numDivisions = 25; // Number of squares each row in the grid contains.
 const minWidth = numDivisions * 4;
 const maxWidth = numDivisions * 40;
 
+// Colors for board and snake
 const col1 = 'red';
 const col2 = 'gold';
 const col3 = 'white';
@@ -15,71 +16,37 @@ var ctx = canvas.getContext('2d');
 drawGameBoardGrid(ctx, width, squareSize, col3, col4);
 
 var lastKey = 37;
-//Event listeners for keys
 window.addEventListener('keydown', (event) => { lastKey = event.keyCode; });
 
 
-var start = new SnakeSegment(12, 12, col1, col2);
-var snake = new Snake(start);
-
-var y = createNextSegment(37, snake.getHeadX(), snake.getHeadY(), col1, col2);
-snake.updateSnake(y, true);
-console.log('length = ' + snake.length());
-y = createNextSegment(37, snake.getHeadX(), snake.getHeadY(), col1, col2);
-snake.updateSnake(y, true);
-y = createNextSegment(37, snake.getHeadX(), snake.getHeadY(), col1, col2);
-snake.updateSnake(y, true);
-drawSnake(ctx, squareSize, snake.getSnake());
-var m = createFood(numDivisions, col1, col2, snake);
-console.log('m x = ' + m.getX());
-console.log('m y = ' + m.getY());
-drawSquare(ctx, squareSize, m.getX(), m.getY(), col1, col2);
-
-var y = new SnakeSegment(5, 10, col1, col2);
-console.log(snake.intersectsSnake(y.getX(), y.getY()) + ' should be false');
-console.log('---------------');
-y = new SnakeSegment(7, 11, col1, col2);
-console.log(snake.intersectsSnake(y.getX(), y.getY()) + ' should be false');
-console.log('---------------');
-y = new SnakeSegment(12, 12, col1, col2);
-console.log(snake.intersectsSnake(y.getX(), y.getY()) + 'should be true');
-console.log('---------------');
-y = new SnakeSegment(11, 12, col1, col2);
-console.log(snake.intersectsSnake(y.getX(), y.getY()) + 'should be true');
-console.log('---------------');
-y = new SnakeSegment(10, 10, col1, col2);
-console.log(snake.intersectsSnake(y.getX(), y.getY()) + ' should be false');
-console.log('---------------');
-y = new SnakeSegment(10, 12, col1, col2);
-console.log(snake.intersectsSnake(y.getX(), y.getY()) + 'should be true');
-console.log('---------------');
-y = new SnakeSegment(9, 12, col1, col2);
-console.log(snake.intersectsSnake(y.getX(), y.getY()) + 'should be true');
-console.log('---------------');
-y = new SnakeSegment(8, 12, col1, col2);
-console.log(snake.intersectsSnake(y.getX(), y.getY()) + ' should be false');
-console.log('---------------');
+let snake = new Snake(new SnakeSegment(12, 12, col1, col2));
+let food = new Food();
+food.createNewFood(numDivisions, col1, col2, snake);
+//setInterval(function(){ gameLoop(snake, food, lastKey, ctx, width, squareSize, col1, col2, col3, col4); }, 100);
 
 
-
-//setInterval(function(){ gameLoop(snake, lastKey, ctx, width, squareSize, col1, col2, col3, col4); }, 300);
-
-
-function createFood(numDivisions, col1, col2, snake) {
-	let x = getRand(numDivisions);
-	let y = getRand(numDivisions);
+/* TESTED
+*/
+function Food() {
+	this.food = null
 	
-	while(snake.intersectsSnake(x, y)) {
-		x = getRand(numDivisions);
-		y = getRand(numDivisions);
+	this.getFood = function() { return this.food; }
+	this.createNewFood = function(numDivisions, col1, col2, snake) {
+		let x = getRand(numDivisions);
+		let y = getRand(numDivisions);
+		
+		while(snake.intersectsSnake(x, y)) {
+			x = getRand(numDivisions);
+			y = getRand(numDivisions);
+		}
+		this.food = new SnakeSegment(x, y, col1, col2);
 	}
-	
-	return new SnakeSegment(x, y, col1, col2);
 }
 
 
 
-
+/* TESTED
+*/
 function getRand(max) {
 	return Math.floor(Math.random() * max);
 }
@@ -90,11 +57,16 @@ function getRand(max) {
 
 
 
-function gameLoop(snake, lastKey, ctx, width, squareSize, col1, col2, col3, col4) {
-	var newHead = createNextSegment(lastKey, snake.getHeadX(), snake.getHeadY(), col1, col2);
-	snake.updateSnake(newHead, false);
+function gameLoop(snake, food, lastKey, ctx, width, squareSize, col1, col2, col3, col4) {
+	let newHead = createNextSegment(lastKey, snake.getHeadX(), snake.getHeadY(), col1, col2);
+	let currFood = food.getFood();
+	let grow = (snake.intersectHead(currFood)) ? true : false;
+	if(grow) { food.createNewFood(numDivisions, col1, col2, snake); }
+	
+	snake.updateSnake(newHead, grow);
 	drawGameBoardGrid(ctx, width, squareSize, col3, col4);
 	drawSnake(ctx, squareSize, snake.getSnake());
+	drawSquare(ctx, squareSize, food.getFood().getX(), food.getFood().getY(), col1, col2);
 }
 
 
