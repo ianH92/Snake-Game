@@ -3,18 +3,49 @@ const numDivisions = 25; // Number of squares each row in the grid contains.
 const minWidth = numDivisions * 4;
 const maxWidth = numDivisions * 40;
 
+//Global Variables
 var canvas = document.querySelector('canvas');
 var width = canvas.width;
 var squareSize = width / numDivisions;
 var ctx = canvas.getContext('2d');
+startScreen(ctx);
 
 var lastKey = 37;
 window.addEventListener('keydown', (event) => { 
 	lastKey = (event.keyCode > 36 && event.keyCode < 41) ? event.keyCode : lastKey; 
 });
 
-let snake = new Snake(new Coordinates(12, 12), new Coordinates(12, 6));
-var intervalID = setInterval(function(){ gameLoop(snake, lastKey, ctx, width, squareSize, numDivisions); }, 100);
+var play = false;
+var intervalID = 0;
+let snake = null;
+canvas.addEventListener('click', function() {
+	if(!play) {
+		intervalID = playGame();
+		play = true;
+	}
+});
+
+/**
+ * Starts a new game.
+ * @return {number} The id needed by clearInterval to stop setInterval.
+ */
+function playGame() {
+	snake = new Snake(new Coordinates(12, 12), new Coordinates(12, 6));
+	ctx.fillStyle = 'white';
+	ctx.fillRect(0, 0, width, width);
+	return setInterval(function(){ gameLoop(snake, lastKey, ctx, width, squareSize, numDivisions); }, 100);
+}
+
+/**
+ * Draws the start screen.
+ *
+ * @param {CanvasRenderingContext2D} ctx The canvas rendering context.
+ */
+function startScreen(ctx) {
+	ctx.font = '25px monospace';
+	ctx.fillStyle = 'gold';
+	ctx.fillText('Click Here to Play', width / 5 , width / 2);
+}
 
 /** 
  * Clears board and displays 'GAME OVER'. Stops the game.
@@ -23,12 +54,17 @@ var intervalID = setInterval(function(){ gameLoop(snake, lastKey, ctx, width, sq
  * @param {number} width The width of the canvas.
  */
 function gameOver(ctx, width) {
+	play = false;
 	ctx.fillStyle = 'white';
 	ctx.fillRect(0, 0, width, width);
 	
 	ctx.font = '55px monospace';
 	ctx.fillStyle = 'red';
 	ctx.fillText('GAME OVER', width / 5 , width / 2);
+	
+	ctx.font = '25px monospace';
+	ctx.fillStyle = 'gold';
+	ctx.fillText('Click to Play Again', width / 5, (width / 3) * 2);
 	clearInterval(intervalID);
 }
 
