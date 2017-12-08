@@ -16,6 +16,12 @@ window.addEventListener('keydown', (event) => {
 let snake = new Snake(new Coordinates(12, 12), new Coordinates(12, 6));
 var intervalID = setInterval(function(){ gameLoop(snake, lastKey, ctx, width, squareSize, numDivisions); }, 100);
 
+/** 
+ * Clears board and displays 'GAME OVER'. Stops the game.
+ *
+ * @param {CanvasRenderingContext2D} ctx The canvas rendering context.
+ * @param {number} width The width of the canvas.
+ */
 function gameOver(ctx, width) {
 	ctx.fillStyle = 'white';
 	ctx.fillRect(0, 0, width, width);
@@ -26,12 +32,26 @@ function gameOver(ctx, width) {
 	clearInterval(intervalID);
 }
 
-/* TESTED
-*/
+/**
+ * Returns a psuedorandom number in the range [0, max).
+ *
+ * @param {number} max The (exclusive) upper range.
+ * @return {number} The pseudorandom number.
+ */
 function getRand(max) {
 	return Math.floor(Math.random() * max);
 }
 
+/**
+ * The game loop which runs the game logic; designed to run repeatedly by setInterval
+ * 
+ * @param {snake} Snake The object containing the snake properties and methods.
+ * @param {number} lastKey The last valid key caught by the eventListener.
+ * @param {CanvasRenderingContext2D} ctx The canvas rendering context.
+ * @param {number} width The width of the canvas.
+ * @param {number} squareSize The size of each element of the grid.
+ * @param {number} numDivs The number of divisions in each row/column of the grid.
+ */
 function gameLoop(snake, lastKey, ctx, width, squareSize, numDivs) {
 	let newHead = createNextSegment(lastKey, snake.getHeadX(), snake.getHeadY());
 	
@@ -48,24 +68,43 @@ function gameLoop(snake, lastKey, ctx, width, squareSize, numDivs) {
 	snake.drawFood(ctx, squareSize);
 }
 
-/* TESTED
-*/
-function drawSquare(canvasCtx, squareSize, x, y, col1, col2) {
-	canvasCtx.fillStyle = col1;
-	canvasCtx.fillRect((x * squareSize), (y * squareSize), squareSize, squareSize);
-	canvasCtx.fillStyle = col2;
-	canvasCtx.fillRect((x * squareSize) + 2, (y * squareSize) + 2, squareSize - 4, squareSize - 4);
+/**
+ * Draws a square on the canvas.
+ *
+ * @param {CanvasRenderingContext2D} ctx The canvas rendering context.
+ * @param {number} squareSize The size of each element of the grid.
+ * @param {number} x The x coordinate of the upper left corner.
+ * @param {number} y The y coordinate of the upper left corner.
+ * @param {String} col1 The border color of the square.
+ * @param {String} col2 The internal color of the square.
+ */
+function drawSquare(ctx, squareSize, x, y, col1, col2) {
+	ctx.fillStyle = col1;
+	ctx.fillRect((x * squareSize), (y * squareSize), squareSize, squareSize);
+	ctx.fillStyle = col2;
+	ctx.fillRect((x * squareSize) + 2, (y * squareSize) + 2, squareSize - 4, squareSize - 4);
 }
 
-/* TESTED
-*/
+/**
+ * Draws a white square on the canvas.
+ *
+ * @param {CanvasRenderingContext2D} ctx The canvas rendering context.
+ * @param {number} squareSize The size of each element of the grid.
+ * @param {number} x The x coordinate of the upper left corner.
+ * @param {number} y The y coordinate of the upper left corner.
+ */
 function drawOverSquare(canvasCtx, squareSize, x, y) {
 	canvasCtx.fillStyle = 'white';
 	canvasCtx.fillRect((x * squareSize), (y * squareSize), squareSize, squareSize);
 }
 
-/* TESTED
-*/
+/**
+ * Snake object which contains the coordinates of the snake segments and food.
+ *
+ * @constructor
+ * @param {Coordinates} startSegment The starting coordinates of the head.
+ * @param {Coordinates} startFood The starting coordinates of the food.
+ */
 function Snake(startSegment, startFood) {
 	this.color1 = 'red'
 	this.color2 = 'gold';
@@ -74,13 +113,20 @@ function Snake(startSegment, startFood) {
 	this.oldTail = null;
 	this.food = startFood;
 	
+	/* Simple getter methods.
+	 */
 	this.length = function() { return this.snake.length; }
 	this.getHead = function() { return this.snake[0]; }
 	this.getHeadX = function() { return this.snake[0].getX(); }
 	this.getHeadY = function() { return this.snake[0].getY(); }
 	this.getSnake = function() { return this.snake; }
 	
-	/* TESTED */
+	/**
+	 * Updates the snake by adding new head to queue and popping tail if snake did not grow.
+	 *
+	 * @param {Coordinates} newHead The coordinates of the new head.
+	 * @param {boolean} growSnake A boolean designating if the snake grew.
+	 */
 	this.updateSnake = function(newHead, growSnake) {
 		this.snake.unshift(newHead);
 		if(!growSnake) { 
@@ -88,7 +134,13 @@ function Snake(startSegment, startFood) {
 		}
 	}
 	
-	/* TESTED */
+	/**
+	 * Checks if coordinates intersect any part of the snake.
+	 *
+	 * @param {number} x The x coordinate to check.
+	 * @param {number} y The y coordinate to check.
+	 * @return {boolean} true if intersects, false otherwise.
+	 */
 	this.intersectsSnake = function(x, y) {
 		for(var i = 0; i < this.snake.length; i++) {
 			var currSeg = this.snake[i];
@@ -100,46 +152,68 @@ function Snake(startSegment, startFood) {
 		return false;
 	}
 	
-	/* TESTED */
+	/**
+	 * Check if the snakes head intersected the food.
+	 *
+	 * @return {boolean} true if the head intersected the food, false otherwise.
+	 */
 	this.headIntersectsFood = function() {
 		var s= this.snake[0];
 		return (this.food.getX() === s.getX() && this.food.getY() === s.getY());
 	}
 	
-	/* TESTED - only need to draw the new head and if necessary overdraw old tail
-	*/
-	this.drawSnake = function(ctx, gridElementLen) {
+	/**
+	 * Draw the snake on the board. Works by simply drawing the new head and if needed blanking out
+	 * the old tail-end.
+	 *
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context.
+	 * @param {number} squareSize The size of each element of the grid.
+	 */
+	this.drawSnake = function(ctx, squareSize) {
 		let s = this.snake[0];
-		drawSquare(ctx, gridElementLen, s.getX(), s.getY(), this.color1, this.color2);
+		drawSquare(ctx, squareSize, s.getX(), s.getY(), this.color1, this.color2);
 		
 		s = this.oldTail;
 		if(s !== null) {
-			drawOverSquare(ctx, gridElementLen, s.getX(), s.getY());
+			drawOverSquare(ctx, squareSize, s.getX(), s.getY());
 		}
 	}
 	
+	/**
+	 * Convenience method to draw the food. Same thing as drawSqaure().
+	 *
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context.
+	 * @param {number} squareSize The size of each element of the grid.
+	 */
 	this.drawFood = function(ctx, squareSize) {
 		drawSquare(ctx, squareSize, this.food.getX(), this.food.getY(), this.color1, this.color2);
 	}
 	
-	/* TESTED */
+	/**
+	 * Generates the coordinates for the new food randomly. Coordinates won't intersect the snake.
+	 *
+	 * @param {number} numDivisions The number of divisions in each row/column of the grid.
+	 * @return {Coordinates} The coordinates of the new food.
+	 */
 	this.createNewFood = function(numDivisions) {
 		let x = getRand(numDivisions);
 		let y = getRand(numDivisions);
-		console.log('x = ' + x);
-		console.log('y = ' + y);
+		
 		while(this.intersectsSnake(x, y)) {
 			x = getRand(numDivisions);
 			y = getRand(numDivisions);
 		}
 		this.food = new Coordinates(x, y);
-		console.log('food x = ' + this.food.getX());
-		console.log('food y = ' + this.food.getY());
 	}
 }
 
-/* TESTED
-*/
+/**
+ * Checks if coordinates are outside allowed borders.
+ *
+ * @param {Coordinates} segment The coordinates to check.
+ * @param {number} numOfDivisons The number of divisions in each row/column of the grid.
+ * @return {boolean} true if coordinates are outside of borders, false otherwise.
+ */
 function outsideOfBorders(segment, numOfDivisions) {
 	var x = segment.getX();
 	var y = segment.getY();
@@ -147,8 +221,14 @@ function outsideOfBorders(segment, numOfDivisions) {
 	return (x < 0 || y < 0 || x > maxCoord || y > maxCoord) ? true : false;
 }
 
-/* TESTED
-*/
+/**
+ * Creates the next head of the snake based on keyboard input. 
+ *
+ * @param {number} keystroke The last valid keystroke entered by the user.
+ * @param {number} x The x coordinate of the current head.
+ * @param {number} y The y coordinate of the current head.
+ * @return {Coordinates} The coordinates of the new head.
+ */
 function createNextSegment(keystroke, x, y) {
 	switch(keystroke) {
 		case 37: x += -1; //left
@@ -164,31 +244,43 @@ function createNextSegment(keystroke, x, y) {
 	return new Coordinates(x, y);
 }
 
-/* TESTED
-*/
+/**
+ * Coordinates object hold simple cartesian coordinates.
+ *
+ * @constructor
+ * @param {number} x The x coordinate.
+ * @param {number} y The y coordinate.
+ */
 function Coordinates(x, y) {
 	this.x = x;
 	this.y = y;
 	
+	// Simple getter methods.
 	this.getX = function() { return this.x; }
 	this.getY = function() { return this.y; }
 }
 
-/* TESTED
-Creates a square canvas of the specified dimension
-*/
+/**
+ * Creates a square canvas of the specified dimensions.
+ *
+ * @param {number} dimension The length and width of the canvas.
+ * @return {Canvas} The canvas.
+ */
 function createBoard(dimension) {
 	var canvas = document.createElement('canvas');
 	canvas.width = canvas.height = dimension;
 	return canvas;
 }
 
-/* TESTED
-Checks to ensure the canvas meets three conditions:
-1-canvas must be square (width = height)
-2-canvas must be divisible by numDivisions (always set to 25)
-3-canvas must be >= minWidth x minWidth and <= maxWidth x maxWidth
-*/
+/**
+ * Checks to ensure the canvas meets three conditions:
+ * 1-canvas must be square (width = height)
+ * 2-canvas must be divisible by numDivisions (always set to 25)
+ * 3-canvas must be >= minWidth x minWidth and <= maxWidth x maxWidth
+ *
+ * @throws GameBoardError.
+ * @param {Canvas} canvas The canvas to check.
+ */
 function checkCanvas(canvas) {
 	var width = canvas.width;
 	var height = canvas.height;
@@ -208,9 +300,11 @@ function checkCanvas(canvas) {
 	}
 }
 
-/* TESTED
-Error for internal logic. Thrown when the gameboard is not correct.
-*/
+/**
+ * Error message for debugging
+ *
+ * @param {String} msg The error message.
+ */
 function GameBoardError(msg) {
 	this.msg = msg;
 	this.name = 'GameBoardError';
