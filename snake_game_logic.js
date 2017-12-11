@@ -10,6 +10,10 @@ var squareSize = width / numDivisions;
 var ctx = canvas.getContext('2d');
 startScreen(ctx);
 
+// Scorebox
+var score = document.querySelector('.score');
+var numScore = 1;
+
 var lastKey = 37;
 window.addEventListener('keydown', (event) => { 
 	lastKey = (event.keyCode > 36 && event.keyCode < 41) ? event.keyCode : lastKey; 
@@ -44,7 +48,8 @@ function playGame() {
 function startScreen(ctx) {
 	ctx.font = '25px monospace';
 	ctx.fillStyle = 'gold';
-	ctx.fillText('Click Here to Play', width / 5 , width / 2);
+	ctx.textAlign = 'center';
+	ctx.fillText('Click Here to Play', width / 2 , width / 2);
 }
 
 /** 
@@ -60,11 +65,16 @@ function gameOver(ctx, width) {
 	
 	ctx.font = '55px monospace';
 	ctx.fillStyle = 'red';
-	ctx.fillText('GAME OVER', width / 5 , width / 2);
+	ctx.textAlign = 'center';
+	ctx.fillText('GAME OVER', width / 2 , width / 2);
 	
 	ctx.font = '25px monospace';
 	ctx.fillStyle = 'gold';
-	ctx.fillText('Click to Play Again', width / 5, (width / 3) * 2);
+	ctx.fillText('Click to Play Again', width / 2, width / 1.5);
+	
+	score.textContent = 1;
+	numScore = 1;
+	
 	clearInterval(intervalID);
 }
 
@@ -97,6 +107,8 @@ function gameLoop(snake, lastKey, ctx, width, squareSize, numDivs) {
 	}
 	let grow = snake.headIntersectsFood();
 	if(grow) { 
+		numScore++;
+		score.textContent = numScore;
 		snake.createNewFood(numDivs); 
 	}
 	snake.updateSnake(newHead, grow);
