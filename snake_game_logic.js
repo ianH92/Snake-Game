@@ -24,19 +24,6 @@ scoreBox.style.width = canvas.width + 'px';
 var score = document.getElementById('score');
 var numScore = 1;
 
-window.addEventListener('resize', (event) => {
-	windowWidth = window.innerWidth;
-	width = calcWidth(windowWidth);
-	
-	canvasParent.removeChild(canvas);
-	canvas = createBoard(width);
-	canvasParent.appendChild(canvas);
-	
-	ctx = canvas.getContext('2d');
-	squareSize = canvas.width / numDivisions;
-	scoreBox.style.width = canvas.width + 'px';
-	console.log('here');
-});
 
 var lastKey = 37;
 window.addEventListener('keydown', (event) => { 
