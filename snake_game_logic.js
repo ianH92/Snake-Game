@@ -1,18 +1,42 @@
 // Global constants
 const numDivisions = 25; // Number of squares each row in the grid contains.
 const minWidth = numDivisions * 4;
-const maxWidth = numDivisions * 40;
+const maxWidth = numDivisions * 32;
 
-//Global Variables
+var canvasParent = document.getElementById('gameboard');
 var canvas = document.querySelector('canvas');
-var width = canvas.width;
-var squareSize = width / numDivisions;
+
+var windowWidth = window.innerWidth;
+var width = calcWidth(windowWidth);
+
+canvasParent.removeChild(canvas);
+canvas = createBoard(width);
+canvasParent.appendChild(canvas);
+
 var ctx = canvas.getContext('2d');
-startScreen(ctx);
+var squareSize = canvas.width / numDivisions;
+startScreen(ctx, canvas.width);
+
+var scoreBox = document.getElementById('scoreboard');
+scoreBox.style.width = canvas.width + 'px';
 
 // Scorebox
-var score = document.querySelector('.score');
+var score = document.getElementById('score');
 var numScore = 1;
+
+window.addEventListener('resize', (event) => {
+	windowWidth = window.innerWidth;
+	width = calcWidth(windowWidth);
+	
+	canvasParent.removeChild(canvas);
+	canvas = createBoard(width);
+	canvasParent.appendChild(canvas);
+	
+	ctx = canvas.getContext('2d');
+	squareSize = canvas.width / numDivisions;
+	scoreBox.style.width = canvas.width + 'px';
+	console.log('here');
+});
 
 var lastKey = 37;
 window.addEventListener('keydown', (event) => { 
@@ -28,6 +52,18 @@ canvas.addEventListener('click', function() {
 		play = true;
 	}
 });
+
+function calcWidth(windowWidth) {
+	let availWidth = Math.floor(windowWidth / numDivisions) * numDivisions;
+	
+	if(availWidth < minWidth) {
+		return minWidth;
+	} else if(availWidth > maxWidth) { 
+		return maxWidth;
+	} else {
+		return availWidth;
+	}
+}
 
 /**
  * Starts a new game.
@@ -45,7 +81,7 @@ function playGame() {
  *
  * @param {CanvasRenderingContext2D} ctx The canvas rendering context.
  */
-function startScreen(ctx) {
+function startScreen(ctx, width) {
 	ctx.font = '25px monospace';
 	ctx.fillStyle = 'gold';
 	ctx.textAlign = 'center';
