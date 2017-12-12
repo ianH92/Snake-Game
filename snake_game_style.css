@@ -11,14 +11,14 @@ canvas {
 	left: 0px;
 }
 
-.scoreboard {
+#scoreboard {
 	margin: 5px auto;
 	border: 1px solid black;
 	width: 500px;
 
 }
 
-.scoreboard > table {
+#scoreboard > table {
 	margin: 0 auto;
 }
 
