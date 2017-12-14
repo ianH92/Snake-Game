@@ -1,7 +1,7 @@
 // Global constants
 const numDivisions = 25; // Number of squares each row in the grid contains.
 const minWidth = numDivisions * 4;
-const maxWidth = numDivisions * 32;
+const maxWidth = numDivisions * 25;
 
 var canvasParent = document.getElementById('gameboard');
 var canvas = document.querySelector('canvas');
