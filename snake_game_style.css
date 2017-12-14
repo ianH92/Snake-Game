@@ -36,3 +36,7 @@ td {
 #leftarrow {
 	margin-left: 37%;
 }
+
+.arrow:hover {
+	border: 2px solid gold;
+}
