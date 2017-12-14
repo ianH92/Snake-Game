@@ -26,3 +26,13 @@ td {
 	font-family: monospace;
 	padding: 10px;
 }
+
+.arrow {
+	margin-right: 2%;
+	width: 5%;
+	border: 1px solid black;
+}
+
+#leftarrow {
+	margin-left: 37%;
+}

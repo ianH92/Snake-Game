@@ -24,11 +24,21 @@ scoreBox.style.width = canvas.width + 'px';
 var score = document.getElementById('score');
 var numScore = 1;
 
-
 var lastKey = 37;
 window.addEventListener('keydown', (event) => { 
 	lastKey = (event.keyCode > 36 && event.keyCode < 41) ? event.keyCode : lastKey; 
 });
+
+var leftArrow = document.getElementById('leftarrow');
+var upArrow = document.getElementById('uparrow');
+var downArrow = document.getElementById('downarrow');
+var rightArrow = document.getElementById('rightarrow');
+
+leftArrow.addEventListener('click', function() { lastKey = 37; });
+upArrow.addEventListener('click', function() { lastKey = 38; });
+rightArrow.addEventListener('click', function() { lastKey = 39; });
+downArrow.addEventListener('click', function() { lastKey = 40; });
+
 
 var play = false;
 var intervalID = 0;
